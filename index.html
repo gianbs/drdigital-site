@@ -24,7 +24,6 @@
     </a>
     <nav class="nav" id="nav" aria-label="Principal">
       <a href="#servicos">Serviços</a>
-      <a href="#trabalhos">Trabalhos</a>
       <a href="#como-funciona">Como funciona</a>
       <a href="#sobre">Sobre</a>
       <a href="#contato">Contato</a>
@@ -56,8 +55,8 @@
       </div>
 
       <div class="hero__art" aria-hidden="true">
-        <figure class="photo photo--a"><img src="assets/trabalhos/panfleto-adesivo.webp" alt="" width="692" height="924"></figure>
-        <figure class="photo photo--b"><img src="assets/trabalhos/bingo-bloco.webp" alt="" width="692" height="924"></figure>
+        <figure class="hero__photo"><img src="assets/img/impressao-offset.webp" alt="" width="1400" height="935"></figure>
+        <div class="hero__chip"><img src="assets/icon.svg" alt="" width="28" height="30"><span><b>Cores vivas</b><small>Impressão CMYK</small></span></div>
         <div class="stamp">
           <div class="stamp__top"></div>
           <div class="stamp__body">NYKON</div>
@@ -124,8 +123,8 @@
 
         <!-- Panfletos -->
         <article class="card" style="--c: var(--magenta)">
-          <div class="card__media card__media--photo">
-            <img src="assets/trabalhos/panfleto-estetica.webp" style="object-position: center 18%" alt="Panfletos coloridos impressos pela Dr Digital" loading="lazy" width="660" height="844">
+          <div class="card__media media--flyer">
+            <div class="flyer f1"></div><div class="flyer f2"></div><div class="flyer f3"></div>
           </div>
           <div class="card__body">
             <h3>Panfletos</h3>
@@ -156,8 +155,9 @@
 
         <!-- Blocos -->
         <article class="card" style="--c: var(--cyan)">
-          <div class="card__media card__media--photo">
-            <img src="assets/trabalhos/bloco-pedidos.webp" alt="Bloco de pedidos personalizado" loading="lazy" width="910" height="1156">
+          <div class="card__media media--pad">
+            <div class="pad pad--3"></div><div class="pad pad--2"></div>
+            <div class="pad pad--1"><div class="pad__head"><img src="assets/icon.svg" alt=""><span>PEDIDO</span><em>Nº 0001</em></div><i></i><i></i><i></i><i></i><i></i></div>
             <span class="badge">Autocopiativo</span>
           </div>
           <div class="card__body">
@@ -192,8 +192,9 @@
 
         <!-- Bingo -->
         <article class="card" style="--c: var(--yellow)">
-          <div class="card__media card__media--photo">
-            <img src="assets/trabalhos/bingo-producao.webp" alt="Cartelas de bingo sendo impressas" loading="lazy" width="960" height="978">
+          <div class="card__media media--bingo">
+            <div class="bingo bingo--back"></div>
+            <div class="bingo"><div class="bingo__head"><b>B</b><b>I</b><b>N</b><b>G</b><b>O</b></div><div class="bingo__grid"><span>3</span><span>18</span><span>33</span><span>49</span><span>62</span><span>7</span><span>21</span><span class="star">★</span><span>52</span><span>70</span><span>12</span><span>25</span><span>38</span><span>57</span><span>66</span></div><div class="bingo__foot">Nº 000123</div></div>
           </div>
           <div class="card__body">
             <h3>Cartelas de bingo</h3>
@@ -310,28 +311,6 @@
     </div>
   </section>
 
-  <!-- TRABALHOS -->
-  <section class="section section--soft" id="trabalhos">
-    <div class="wrap">
-      <div class="section__head section__head--row">
-        <div>
-          <span class="eyebrow">Portfólio</span>
-          <h2>Trabalhos que saíram da nossa gráfica</h2>
-          <p>Alguns pedidos de clientes de Acopiara e região. Veja mais no nosso Instagram.</p>
-        </div>
-        <a class="btn btn--ghost" href="https://www.instagram.com/_drdigital/" target="_blank" rel="noopener">Ver no Instagram →</a>
-      </div>
-      <div class="gallery">
-        <figure class="g g--tall"><img src="assets/trabalhos/bloco-pedidos.webp" alt="Bloco de pedidos personalizado" loading="lazy"><figcaption>Bloco de pedidos</figcaption></figure>
-        <figure class="g"><img src="assets/trabalhos/blocos-numerados.webp" alt="Blocos de recibo numerados com 2 vias" loading="lazy"><figcaption>Recibos numerados 2 vias</figcaption></figure>
-        <figure class="g"><img src="assets/trabalhos/panfleto-adesivo.webp" alt="Panfletos e adesivos redondos" loading="lazy"><figcaption>Panfletos + adesivos</figcaption></figure>
-        <figure class="g g--tall"><img src="assets/trabalhos/comanda.webp" alt="Blocos de comanda de mesa" loading="lazy"><figcaption>Comandas de mesa</figcaption></figure>
-        <figure class="g"><img src="assets/trabalhos/ingressos.webp" alt="Ingressos numerados" loading="lazy"><figcaption>Ingressos</figcaption></figure>
-        <figure class="g"><img src="assets/trabalhos/bingo-bloco.webp" alt="Bloco de cartelas de bingo" loading="lazy"><figcaption>Cartelas de bingo</figcaption></figure>
-      </div>
-    </div>
-  </section>
-
   <!-- COMO FUNCIONA -->
   <section class="section section--navy" id="como-funciona">
     <div class="wrap">
@@ -351,8 +330,9 @@
   <!-- SOBRE -->
   <section class="section section--soft" id="sobre">
     <div class="wrap about">
-      <div class="about__logo">
-        <img src="assets/logo.svg" alt="Logo Dr Digital Gráfica" width="424" height="336">
+      <div class="about__media">
+        <img class="about__photo" src="assets/img/criacao-arte.webp" alt="Designer escolhendo cores para uma arte gráfica" loading="lazy" width="1200" height="800">
+        <div class="about__badge"><img src="assets/logo.svg" alt="Logo Dr Digital Gráfica" width="424" height="336"></div>
       </div>
       <div class="about__text">
         <span class="eyebrow">Sobre nós</span>
