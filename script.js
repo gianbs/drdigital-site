@@ -1,5 +1,5 @@
 // Número do WhatsApp (DDI + DDD + número, só dígitos)
-const WHATSAPP = "5588999213150";
+const WHATSAPP = "5588996061140";
 
 const waLink = (msg) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 

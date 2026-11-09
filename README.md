@@ -9,7 +9,7 @@ Site da Dr Digital Gráfica (Acopiara-CE). Feito só com HTML, CSS e JavaScript,
 - `assets/`: logos em SVG
 
 ## Como editar
-- **Trocar o número do WhatsApp:** edite `const WHATSAPP = "5588999213150";` em `script.js`
+- **Trocar o número do WhatsApp:** edite `const WHATSAPP = "5588996061140";` em `script.js`
 - **Adicionar opções a um produto:** em `index.html`, copie uma linha `<option>...</option>` dentro do produto
 - **Mensagem dos botões simples:** altere o atributo `data-wa="..."`
 
