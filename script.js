@@ -16,7 +16,7 @@ document.querySelectorAll("form.order").forEach((form) => {
     e.preventDefault();
     const linhas = [`Olá, Dr Digital! Quero comprar: *${form.dataset.product}*`, ""];
     form.querySelectorAll("select, input").forEach((f) => {
-      if (f.type === "checkbox") {
+      if (f.type === "checkbox" || f.type === "radio") {
         if (f.checked) linhas.push(`• ${f.name}: ${f.value}`);
       } else if (f.value) {
         linhas.push(`• ${f.name}: ${f.value}`);
@@ -25,6 +25,12 @@ document.querySelectorAll("form.order").forEach((form) => {
     linhas.push("", "Pode me passar o valor e o prazo?");
     window.open(waLink(linhas.join("\n")), "_blank", "noopener");
   });
+});
+
+// Nome da cor escolhida no seletor de cores
+document.querySelectorAll(".swatches").forEach((box) => {
+  const nome = box.querySelector(".sw-name");
+  box.addEventListener("change", (e) => { nome.textContent = e.target.value; });
 });
 
 // Menu mobile
@@ -51,7 +57,7 @@ const io = new IntersectionObserver((entries) => {
     if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
   });
 }, { threshold: 0.12 });
-document.querySelectorAll(".card, .extra, .steps li, .about > *, .contact > *, .section__head")
+document.querySelectorAll(".card, .nk, .extra, .steps li, .about > *, .contact > *, .section__head")
   .forEach((el) => { el.classList.add("reveal"); io.observe(el); });
 
 document.getElementById("ano").textContent = new Date().getFullYear();
