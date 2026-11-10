@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Caixa Dr Digital</title>
+  <meta name="description" content="Controle de caixa da Dr Digital Gráfica.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Caixa">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icone-180.png">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    // Aplica o tema escolhido antes de desenhar a página (evita piscar).
+    try {
+      var t = localStorage.getItem('caixa-tema');
+      if (t === 'escuro') document.documentElement.setAttribute('data-theme', 'dark');
+      if (t === 'claro') document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <div id="app"><div class="carregando"><img src="assets/icon.svg" alt="Carregando…"></div></div>
+  <div id="camadas"></div>
+  <div id="avisos" aria-live="polite"></div>
+  <noscript><p style="padding:24px;font-family:sans-serif">Este aplicativo precisa de JavaScript ativado.</p></noscript>
+  <script src="config.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

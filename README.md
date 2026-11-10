@@ -17,3 +17,6 @@ Site da Dr Digital Gráfica (Acopiara-CE). Feito só com HTML, CSS e JavaScript,
 1. Abra o repositório no GitHub → **Settings** → **Pages**
 2. Em *Source* escolha **Deploy from a branch**, branch **main**, pasta **/ (root)** → **Save**
 3. Em 1 a 2 minutos o site fica em `https://gianbs.github.io/drdigital-site/`
+
+## Controle de caixa
+A pasta `caixa/` tem o aplicativo de controle de caixa da gráfica (receitas, despesas, vendas parceladas, gastos fixos, clientes e exportação para planilha). Ele é independente do site: veja `caixa/README.md` para ligar a nuvem e publicar. Com o GitHub Pages ligado, abre em `https://gianbs.github.io/drdigital-site/caixa/`.
