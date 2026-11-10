@@ -3,6 +3,6 @@
 // Para ligar a nuvem, siga o passo a passo do LEIA-ME e cole aqui a URL e a chave pública do seu projeto.
 // A chave "anon"/"publishable" é pública por natureza: quem protege os dados é o login + as regras do banco (schema.sql).
 window.CAIXA_CONFIG = {
-  supabaseUrl: '',
-  supabaseKey: '',
+  supabaseUrl: 'https://rqkvpezguxcbyvvatmgp.supabase.co',
+  supabaseKey: 'sb_publishable_dLt9KekHcr-ByvMDlhlITw_fcWHv4Rt',
 };
