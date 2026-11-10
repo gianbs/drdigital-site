@@ -23,12 +23,35 @@ const TABELA = 'caixa_registros';
 
 let sb = null;
 let usuario = null;
+let donoId = null; // de quem é o caixa (o próprio usuário, ou o patrão quando é funcionário)
 let rodando = false;
 let denovo = false;
 let relogio = null;
 
 /** status: 'local' | 'saiu' | 'ok' | 'sincronizando' | 'offline' | 'erro' */
-export const estado = { status: nuvemLigada ? 'saiu' : 'local', email: '', erro: '', ultima: null, ofertaLocal: false };
+export const estado = { status: nuvemLigada ? 'saiu' : 'local', email: '', erro: '', ultima: null, ofertaLocal: false, papel: 'dono' };
+/** Funcionário: só lança receitas, vendas e clientes. O banco não entrega despesas nem resumos a ele. */
+export const ehFuncionario = () => estado.papel === 'funcionario';
+const podeGravar = (d) => !d.deleted && (d.col === 'clientes' || d.col === 'vendas' || (d.col === 'lancamentos' && d.data?.tipo === 'receita'));
+
+/** Descobre se quem entrou é funcionário de alguém (tabela caixa_membros). Guarda a resposta para abrir sem internet. */
+async function descobrirPapel(user) {
+  const chave = `drdigital-caixa-papel-${user.id}`;
+  let v = null;
+  try {
+    const { data, error } = await sb.from('caixa_membros').select('dono_id,papel').eq('user_id', user.id).maybeSingle();
+    if (!error) {
+      v = data ? { dono: data.dono_id, papel: 'funcionario' } : { dono: user.id, papel: 'dono' };
+      localStorage.setItem(chave, JSON.stringify(v));
+    }
+  } catch (e) { /* sem internet: usa o que estava guardado */ }
+  if (!v) {
+    try {
+      v = JSON.parse(localStorage.getItem(chave));
+    } catch (e) { /* nada guardado */ }
+  }
+  return v && v.dono ? v : { dono: user.id, papel: 'dono' };
+}
 const ouvintes = new Set();
 export const aoMudarNuvem = (fn) => (ouvintes.add(fn), () => ouvintes.delete(fn));
 function mudar(p) {
@@ -65,10 +88,10 @@ async function puxar() {
 }
 
 async function empurrar() {
-  const sujos = store.sujos();
+  const sujos = ehFuncionario() ? store.sujos().filter(podeGravar) : store.sujos();
   for (let i = 0; i < sujos.length; i += 200) {
     const parte = sujos.slice(i, i + 200);
-    const linhas = parte.map((d) => ({ user_id: usuario.id, id: d.id, col: d.col, data: d.data, deleted: d.deleted }));
+    const linhas = parte.map((d) => ({ user_id: donoId, id: d.id, col: d.col, data: d.data, deleted: d.deleted }));
     const { data, error } = await sb.from(TABELA).upsert(linhas, { onConflict: 'user_id,id' }).select('id,updated_at');
     if (error) throw error;
     const carimbo = new Map((data || []).map((r) => [r.id, r.updated_at]));
@@ -103,15 +126,20 @@ export async function sincronizar() {
 }
 
 const agendar = debounce(() => store.sujos().length && sincronizar(), 1200);
+export const pendentes = () => (nuvemLigada ? (ehFuncionario() ? store.sujos().filter(podeGravar) : store.sujos()).length : 0);
 
 async function abrirConta(user) {
   usuario = user;
+  const v = await descobrirPapel(user);
+  donoId = v.dono;
   await store.init(user.id, { lapides: true });
-  mudar({ email: user.email || '', status: 'sincronizando', ofertaLocal: false });
+  mudar({ email: user.email || '', status: 'sincronizando', ofertaLocal: false, papel: v.papel });
   const ok = await sincronizar();
-  if (ok && store.vazio()) semear();
-  // Se este aparelho foi usado no modo local antes de ligar a nuvem, oferece trazer esses dados (uma vez só).
-  if (ok && !jaOfereceu(user.id) && (await store.temDadosLocais())) mudar({ ofertaLocal: true });
+  if (v.papel === 'dono') {
+    if (ok && store.vazio()) semear();
+    // Se este aparelho foi usado no modo local antes de ligar a nuvem, oferece trazer esses dados (uma vez só).
+    if (ok && !jaOfereceu(user.id) && (await store.temDadosLocais())) mudar({ ofertaLocal: true });
+  }
   clearInterval(relogio);
   relogio = setInterval(() => document.visibilityState === 'visible' && sincronizar(), 45000);
 }
@@ -135,7 +163,7 @@ export async function iniciar() {
     if (evento === 'SIGNED_OUT' && usuario) {
       usuario = null;
       clearInterval(relogio);
-      mudar({ status: 'saiu', email: '' });
+      mudar({ status: 'saiu', email: '', papel: 'dono' });
     }
   });
   let sessao = null;
@@ -165,10 +193,9 @@ export async function sair() {
   } catch (e) {
     console.warn(e);
   }
-  if (u) mudar({ status: 'saiu', email: '' });
+  if (u) mudar({ status: 'saiu', email: '', papel: 'dono' });
 }
 
-export const pendentes = () => (nuvemLigada ? store.sujos().length : 0);
 
 const chaveOferta = (id) => `drdigital-caixa-local-visto-${id}`;
 function jaOfereceu(id) {

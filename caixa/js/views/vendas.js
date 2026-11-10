@@ -6,6 +6,7 @@ import { icon } from '../icons.js';
 import { segmentado, vazio, selo } from '../ui.js';
 import { infoVenda } from '../calc.js';
 import { medidor } from '../charts.js';
+import { ehFuncionario } from '../sync.js';
 
 let filtro = 'abertas';
 
@@ -43,7 +44,7 @@ export default {
         ${segmentado('filtro', [['abertas', 'Em aberto'], ['quitadas', 'Quitadas'], ['todas', 'Todas']], filtro, 'data-muda="filtro"')}
         <button class="btn so-largo" data-acao="nova-venda">${icon('plus')}Nova venda</button>
       </div>
-      <div class="tiles tiles-3">
+      <div class="tiles tiles-3" ${ehFuncionario() ? 'hidden' : ''}>
         <div class="tile"><span class="tile-rotulo">Vendas em aberto</span><b class="tile-valor">${abertas.length}</b><span class="tile-sub">${todas.length} no total</span></div>
         <div class="tile"><span class="tile-rotulo">Falta receber</span><b class="tile-valor">${brl(sum(abertas, (x) => x.i.aberto))}</b><span class="tile-sub">de ${brl(sum(abertas, (x) => x.i.total))} vendidos</span></div>
         <div class="tile ${sum(abertas, (x) => x.i.atrasado) ? 'critico' : ''}"><span class="tile-rotulo">Parcelas em atraso</span><b class="tile-valor">${brl(sum(abertas, (x) => x.i.atrasado))}</b><span class="tile-sub">${abertas.filter((x) => x.i.status === 'atraso').length} vendas com atraso</span></div>

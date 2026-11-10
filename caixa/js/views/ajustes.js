@@ -7,7 +7,7 @@ import { abrirFolha, confirmar, aviso, grupo, campo, segmentado, lerForm, erroCa
 import { saldos } from '../calc.js';
 import { formConta, formTransferencia } from '../forms.js';
 import { exportarExcel, exportarCSV, exportarBackup } from '../exportar.js';
-import { estado, nuvemLigada, sincronizar, sair, pendentes } from '../sync.js';
+import { estado, nuvemLigada, sincronizar, sair, pendentes, ehFuncionario } from '../sync.js';
 import { carregarExemplo } from '../demo.js';
 
 const linhaNav = (icone, titulo, valor, acao, extra = '') =>
@@ -59,8 +59,15 @@ function editarLista(chave, titulo, dica) {
 
 export default {
   titulo: 'Ajustes',
+  tituloDe: () => (ehFuncionario() ? 'Conta' : 'Ajustes'),
   render() {
     const c = config();
+    if (ehFuncionario()) {
+      return `
+        ${nuvem()}
+        ${grupo('Aparência', `<div class="linha campo"><span class="campo-rotulo">Tema</span>${segmentado('tema', [['auto', 'Automático'], ['claro', 'Claro'], ['escuro', 'Escuro']], temaAtual(), 'data-muda="tema"')}</div>`)}
+        <p class="rodape-app">Acesso de funcionário · ${esc(c.empresa)}</p>`;
+    }
     const sd = saldos();
     return `
       ${nuvem()}

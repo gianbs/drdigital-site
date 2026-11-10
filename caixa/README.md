@@ -45,7 +45,35 @@ A chave pública pode ficar no repositório: ela sozinha não dá acesso a nada.
 
 Se você já tinha lançado coisas no modo local, no primeiro login o app pergunta se quer enviar esses dados para a conta.
 
-Para mais de uma pessoa usar o mesmo caixa, todos entram com o mesmo e-mail e senha.
+## Acesso de funcionário (limitado)
+
+O funcionário entra com e-mail e senha próprios e trabalha no mesmo caixa, mas só com vendas e recebimentos.
+
+| | Dono | Funcionário |
+|---|---|---|
+| Lançar receitas, vendas parceladas e clientes | sim | sim |
+| Receber parcelas e cobrar pelo WhatsApp | sim | sim |
+| Resumo, relatórios, saldos e exportação | sim | não |
+| Despesas, gastos fixos e contas a pagar | sim | não |
+| Excluir lançamentos, vendas e clientes | sim | não |
+| Ajustes (contas, categorias, metas, backup) | sim | não |
+
+A restrição é feita no banco: as despesas, os fixos e as transferências nem chegam ao aparelho do funcionário, então não há como calcular lucro ou saldo por lá. Ele enxerga as receitas e as parcelas uma a uma, porque precisa delas para receber.
+
+Para criar:
+
+1. Rode `supabase/funcionarios.sql` no **SQL Editor** (uma vez só).
+2. Crie o usuário em **Authentication → Users → Add user**, com **Auto Confirm User** marcado.
+3. Vincule o funcionário ao dono, no SQL Editor, trocando os e-mails:
+
+```sql
+insert into public.caixa_membros (user_id, dono_id)
+select f.id, d.id from auth.users f, auth.users d
+where f.email = 'EMAIL-DO-FUNCIONARIO' and d.email = 'EMAIL-DO-DONO'
+on conflict (user_id) do update set dono_id = excluded.dono_id;
+```
+
+Para tirar o acesso, apague o usuário em **Authentication → Users**.
 
 ## Publicar
 
@@ -75,6 +103,7 @@ A página tem `noindex`, então não aparece no Google.
 - `js/xlsx.js` e `js/exportar.js`: geração da planilha
 - `js/demo.js`: dados de exemplo
 - `supabase/schema.sql`: tabela e regras de segurança
+- `supabase/funcionarios.sql`: acesso limitado para funcionários
 - `vendor/supabase.js`: biblioteca oficial do Supabase (licença MIT)
 - `sw.js` e `manifest.webmanifest`: instalação e uso sem internet
 

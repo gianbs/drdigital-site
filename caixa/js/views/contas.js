@@ -5,21 +5,24 @@ import { icon } from '../icons.js';
 import { segmentado, vazio } from '../ui.js';
 import { abertos, totaisAbertos, faixas } from '../calc.js';
 import { linhaEntrada } from './comum.js';
+import { ehFuncionario } from '../sync.js';
 
 let aba = 'receita';
 
 export default {
   titulo: 'Contas',
+  tituloDe: () => (ehFuncionario() ? 'A receber' : 'Contas'),
   render(param) {
+    const f = ehFuncionario();
     if (param === 'pagar') aba = 'despesa';
-    if (param === 'receber') aba = 'receita';
+    if (param === 'receber' || f) aba = 'receita';
     const rec = aba === 'receita';
     const lista = abertos(aba);
     const t = totaisAbertos(aba);
     const grupos = faixas(lista);
     return `
-      <div class="barra-filtros">${segmentado('aba', [['receita', 'A receber'], ['despesa', 'A pagar']], aba, 'data-muda="aba"')}</div>
-      <div class="tiles tiles-3">
+      ${f ? '' : `<div class="barra-filtros">${segmentado('aba', [['receita', 'A receber'], ['despesa', 'A pagar']], aba, 'data-muda="aba"')}</div>`}
+      <div class="tiles tiles-3" ${f ? 'hidden' : ''}>
         <div class="tile"><span class="tile-rotulo">${rec ? 'Total a receber' : 'A pagar em 30 dias'}</span><b class="tile-valor">${brl(rec ? t.total : t.atrasado + t.em30)}</b><span class="tile-sub">${lista.filter((e) => !e.virtual).length} lançamentos em aberto</span></div>
         <div class="tile ${t.atrasado ? 'critico' : ''}"><span class="tile-rotulo">${t.atrasado ? icon('alert') : icon('checkCircle')}Em atraso</span><b class="tile-valor">${brl(t.atrasado)}</b><span class="tile-sub">${t.qtdAtrasado ? `${t.qtdAtrasado} ${t.qtdAtrasado === 1 ? 'conta vencida' : 'contas vencidas'}` : 'Tudo em dia'}</span></div>
         <div class="tile"><span class="tile-rotulo">${icon('calendar')}Próximos 7 dias</span><b class="tile-valor">${brl(t.em7)}</b><span class="tile-sub">${rec ? 'previsto para entrar' : 'previsto para sair'}</span></div>

@@ -5,6 +5,7 @@ import { icon } from '../icons.js';
 import { trocaMes, segmentado, vazio } from '../ui.js';
 import { entradas, dataEfetiva, nomeCliente } from '../calc.js';
 import { linhaEntrada } from './comum.js';
+import { ehFuncionario } from '../sync.js';
 
 let ym = ymAtual();
 let filtro = 'todos';
@@ -18,7 +19,8 @@ function lista() {
   } else {
     es = es.filter((e) => ymDe(dataEfetiva(e)) === ym);
   }
-  if (filtro !== 'todos') es = es.filter((e) => e.tipo === filtro);
+  if (ehFuncionario()) es = es.filter((e) => e.tipo === 'receita');
+  else if (filtro !== 'todos') es = es.filter((e) => e.tipo === filtro);
   es = es.slice().sort((a, b) => dataEfetiva(b).localeCompare(dataEfetiva(a)) || (b.criadoEm || '').localeCompare(a.criadoEm || ''));
 
   if (!es.length) {
@@ -39,7 +41,7 @@ function lista() {
     if (n > limite) break;
     n += itens.length;
     const saldo = sum(itens.filter((e) => e.pago), (e) => (e.tipo === 'receita' ? e.valor : e.tipo === 'despesa' ? -e.valor : 0));
-    html += `<section class="grupo"><h3 class="grupo-titulo dia"><span>${esc(dataExtenso(d))}</span>${saldo ? `<span>${saldo > 0 ? '+ ' : '− '}${brl(Math.abs(saldo))}</span>` : ''}</h3>
+    html += `<section class="grupo"><h3 class="grupo-titulo dia"><span>${esc(dataExtenso(d))}</span>${saldo && !ehFuncionario() ? `<span>${saldo > 0 ? '+ ' : '− '}${brl(Math.abs(saldo))}</span>` : ''}</h3>
       <div class="lista">${itens.map((e) => linhaEntrada(e, { data: !!q })).join('')}</div></section>`;
   }
   return html;
@@ -60,14 +62,16 @@ function resumo() {
 
 export default {
   titulo: 'Lançamentos',
+  tituloDe: () => (ehFuncionario() ? 'Receitas' : 'Lançamentos'),
   render() {
+    const f = ehFuncionario();
     return `
       <div class="barra-filtros">
         ${trocaMes(mesNome(ym))}
-        ${segmentado('filtro', [['todos', 'Tudo'], ['receita', 'Receitas'], ['despesa', 'Despesas']], filtro, 'data-muda="filtro"')}
+        ${f ? '' : segmentado('filtro', [['todos', 'Tudo'], ['receita', 'Receitas'], ['despesa', 'Despesas']], filtro, 'data-muda="filtro"')}
       </div>
       <label class="busca">${icon('search')}<input type="search" placeholder="Buscar por descrição, cliente, categoria…" value="${esc(busca)}" data-digita="busca" aria-label="Buscar lançamentos"></label>
-      ${resumo()}
+      ${f ? '' : resumo()}
       <div id="lista-lanc">${lista()}</div>`;
   },
   acoes: {

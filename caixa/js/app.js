@@ -23,22 +23,30 @@ const MENU = [
 ];
 const ABAS = [['resumo', 'Resumo'], ['lancamentos', 'Lançamentos'], ['contas', 'Contas'], ['clientes', 'Clientes'], ['mais', 'Mais']];
 const DENTRO_DE_MAIS = ['vendas', 'fixos', 'relatorios', 'ajustes'];
+// Funcionário: só as telas de venda e recebimento.
+const MENU_FUNC = [['lancamentos', 'Receitas'], ['contas', 'A receber'], ['vendas', 'Vendas parceladas'], ['clientes', 'Clientes'], ['ajustes', 'Conta']];
+const ABAS_FUNC = [['lancamentos', 'Receitas'], ['contas', 'A receber'], ['vendas', 'Vendas'], ['clientes', 'Clientes'], ['ajustes', 'Conta']];
+const func = () => nuvem.ehFuncionario();
+const inicio = () => (func() ? 'lancamentos' : 'resumo');
 const ACOES = { ...acoesGlobais, ...acoesDados };
 
 let pronto = false;
 
 function rota() {
   const [nome = '', param = ''] = location.hash.replace(/^#\/?/, '').split('/');
-  return TELAS[nome] ? { nome, param: decodeURIComponent(param) } : { nome: 'resumo', param: '' };
+  const ok = TELAS[nome] && (!func() || MENU_FUNC.some(([r]) => r === nome));
+  return ok ? { nome, param: decodeURIComponent(param) } : { nome: inicio(), param: '' };
 }
 
 function casca() {
+  const MENU_ = func() ? MENU_FUNC : MENU;
+  const ABAS_ = func() ? ABAS_FUNC : ABAS;
   $('#app').innerHTML = `
     <aside class="lateral">
-      <a class="marca" href="#/resumo" aria-label="Dr Digital Gráfica"><img class="logo-claro" src="assets/logo.svg" alt="Dr Digital Gráfica"><img class="logo-escuro" src="assets/logo-white.svg" alt=""></a>
+      <a class="marca" href="#/${inicio()}" aria-label="Dr Digital Gráfica"><img class="logo-claro" src="assets/logo.svg" alt="Dr Digital Gráfica"><img class="logo-escuro" src="assets/logo-white.svg" alt=""></a>
       <div class="cmyk" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <button class="btn" data-acao="novo">${icon('plus')}Novo lançamento</button>
-      <nav aria-label="Menu">${MENU.map(([r, t]) => `<a href="#/${r}" data-nav="${r}">${icon(r)}<span>${t}</span></a>`).join('')}</nav>
+      <button class="btn" data-acao="novo">${icon('plus')}${func() ? 'Novo' : 'Novo lançamento'}</button>
+      <nav aria-label="Menu">${MENU_.map(([r, t]) => `<a href="#/${r}" data-nav="${r}">${icon(r)}<span>${t}</span></a>`).join('')}</nav>
       <a class="lateral-pe" href="#/ajustes" id="nuvem-lateral"></a>
     </aside>
     <div class="conteudo">
@@ -50,7 +58,7 @@ function casca() {
       <main id="tela" tabindex="-1"><h1 class="titulo-grande"></h1><div id="visao" class="visao"></div></main>
     </div>
     <nav class="abas" aria-label="Abas">
-      <div class="abas-capsula">${ABAS.map(([r, t]) => `<a href="#/${r}" data-aba="${r}">${icon(r)}<span>${t}</span></a>`).join('')}</div>
+      <div class="abas-capsula">${ABAS_.map(([r, t]) => `<a href="#/${r}" data-aba="${r}">${icon(r)}<span>${t}</span></a>`).join('')}</div>
       <button class="abas-mais" data-acao="novo" aria-label="Novo lançamento">${icon('plus')}</button>
     </nav>`;
 }
@@ -72,14 +80,15 @@ function desenhar(manter = true) {
   visao.innerHTML = tela.render(param);
   tela.montar?.(visao);
 
-  const abaAtiva = DENTRO_DE_MAIS.includes(nome) ? 'mais' : nome;
+  const emMais = !func() && DENTRO_DE_MAIS.includes(nome);
+  const abaAtiva = emMais ? 'mais' : nome;
   $$('[data-aba]').forEach((a) => a.classList.toggle('ativo', a.dataset.aba === abaAtiva));
   $$('[data-nav]').forEach((a) => {
     a.classList.toggle('ativo', a.dataset.nav === nome);
     a.dataset.nav === nome ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current');
   });
   const voltar = $('.topo-voltar');
-  const destino = DENTRO_DE_MAIS.includes(nome) ? ['#/mais', 'Mais'] : nome === 'clientes' && param ? ['#/clientes', 'Clientes'] : null;
+  const destino = emMais ? ['#/mais', 'Mais'] : nome === 'clientes' && param ? ['#/clientes', 'Clientes'] : null;
   voltar.hidden = !destino;
   $('.topo-logo').hidden = !!destino;
   if (destino) {

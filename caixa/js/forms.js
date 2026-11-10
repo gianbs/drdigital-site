@@ -7,6 +7,7 @@ import { icon } from './icons.js';
 import { buscarEntrada, gerarParcelas, infoVenda, fimDoFixo, parcelaDoFixo, atrasado, nomeCliente, situacaoClientes } from './calc.js';
 import { salvarLancamento, pagar, desfazerPagamento, excluirEntrada, criarVenda, excluirVenda, excluirFixo, excluirCliente } from './ops.js';
 import { medidor } from './charts.js';
+import { ehFuncionario } from './sync.js';
 
 const contasOps = () => store.all('contas').map((c) => [c.id, c.nome]);
 const clientesOps = () => store.all('clientes').slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).map((c) => [c.id, c.nome]);
@@ -31,11 +32,13 @@ function ligarNovoCliente(form) {
   });
 }
 
-const botaoExcluir = (texto) => `<section class="grupo"><div class="lista"><button type="button" class="linha linha-botao perigo" data-excluir>${icon('trash')}<span>${esc(texto)}</span></button></div></section>`;
+// Funcionário não exclui nada (o banco também recusa).
+const botaoExcluir = (texto) => ehFuncionario() ? '' : `<section class="grupo"><div class="lista"><button type="button" class="linha linha-botao perigo" data-excluir>${icon('trash')}<span>${esc(texto)}</span></button></div></section>`;
 
 // ---------- Receita / despesa ----------
 
 export function formLancamento({ id, tipo = 'receita', preset = {} } = {}) {
+  if (ehFuncionario()) tipo = 'receita';
   const orig = id ? buscarEntrada(id) : null;
   if (id && !orig) return;
   if (orig?.tipo === 'transferencia') return formTransferencia(orig);
@@ -55,7 +58,7 @@ export function formLancamento({ id, tipo = 'receita', preset = {} } = {}) {
       ? `<p class="nota">${icon('repeat')} Vem do fixo “${esc(fixo.descricao)}”. O que mudar aqui vale só para ${esc(mesNome(st.competencia))}.</p>`
       : '';
     return `
-      ${!orig ? segmentado('tipo', [['receita', 'Receita'], ['despesa', 'Despesa']], st.tipo, 'data-refaz') : ''}
+      ${!orig && !ehFuncionario() ? segmentado('tipo', [['receita', 'Receita'], ['despesa', 'Despesa']], st.tipo, 'data-refaz') : ''}
       ${origem}
       ${grupo('', campo({ rotulo: 'Descrição', nome: 'descricao', valor: st.descricao, dica: rec ? 'Ex.: 500 panfletos' : 'Ex.: Resma de papel A4', attrs: 'autofocus' })
         + campo({ rotulo: 'Valor', nome: 'valor', tipo: 'dinheiro', valor: st.valor }))}
@@ -72,7 +75,7 @@ export function formLancamento({ id, tipo = 'receita', preset = {} } = {}) {
   };
 
   const folha = abrirFolha({
-    titulo: orig ? (st.tipo === 'receita' ? 'Editar receita' : 'Editar despesa') : 'Novo lançamento',
+    titulo: orig ? (st.tipo === 'receita' ? 'Editar receita' : 'Editar despesa') : ehFuncionario() ? 'Nova receita' : 'Novo lançamento',
     corpo: html(),
     acao: (f) => {
       const v = { ...st, ...lerForm(f.form) };
@@ -347,6 +350,7 @@ export function cobrar(clienteId) {
 // ---------- Gasto fixo / receita recorrente ----------
 
 export function formFixo({ id, tipo = 'despesa' } = {}) {
+  if (ehFuncionario()) return;
   const orig = id ? store.get(id) : null;
   const atual = ymAtual();
   let st = orig ? { ...orig } : {
@@ -436,6 +440,7 @@ export function formFixo({ id, tipo = 'despesa' } = {}) {
 // ---------- Transferência e contas ----------
 
 export function formTransferencia(orig) {
+  if (ehFuncionario()) return;
   const contas = store.all('contas');
   if (contas.length < 2) return aviso('Cadastre pelo menos duas contas em Ajustes.', { tipo: 'erro' });
   abrirFolha({
@@ -497,6 +502,13 @@ export function formConta(id) {
 // ---------- Menu "+" ----------
 
 export function menuNovo() {
+  if (ehFuncionario()) {
+    return menuAcoes([
+      { rotulo: 'Receita', sub: 'Venda à vista ou valor a receber', icone: 'inflow', fn: () => formLancamento({ tipo: 'receita' }) },
+      { rotulo: 'Venda parcelada', sub: 'Com ou sem entrada', icone: 'layers', fn: () => formVenda() },
+      { rotulo: 'Cliente', icone: 'userPlus', fn: () => formCliente() },
+    ], 'Novo');
+  }
   menuAcoes([
     { rotulo: 'Receita', sub: 'Venda à vista ou valor a receber', icone: 'inflow', fn: () => formLancamento({ tipo: 'receita' }) },
     { rotulo: 'Despesa', sub: 'Compra, conta ou pagamento', icone: 'outflow', fn: () => formLancamento({ tipo: 'despesa' }) },
