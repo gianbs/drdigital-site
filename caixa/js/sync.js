@@ -132,7 +132,9 @@ async function abrirConta(user) {
   usuario = user;
   const v = await descobrirPapel(user);
   donoId = v.dono;
-  await store.init(user.id, { lapides: true });
+  // Cada caixa tem o seu banco no aparelho. Assim, quando um usuário passa a ser funcionário de outro caixa
+  // (ou deixa de ser), o app baixa tudo do zero em vez de misturar com o que havia do caixa anterior.
+  await store.init(v.papel === 'funcionario' ? `${user.id}.${v.dono}` : user.id, { lapides: true });
   mudar({ email: user.email || '', status: 'sincronizando', ofertaLocal: false, papel: v.papel });
   const ok = await sincronizar();
   if (v.papel === 'dono') {
