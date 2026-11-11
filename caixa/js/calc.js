@@ -116,6 +116,22 @@ export function saude(r) {
   return { nivel: 'alerta', titulo: 'Lucro apertado', texto: `Margem de só ${m}. A meta é ${pct(alvo)}.` };
 }
 
+/** Recebido e pago em cada dia (regime de caixa). periodo: "AAAA-MM" ou '' para tudo. Só dias com movimento. */
+export function resumoDias(periodo = '') {
+  return lembrar('dias:' + periodo, () => {
+    const m = new Map();
+    for (const e of store.all('lancamentos')) {
+      if (!ehRD(e) || !e.pago || e.ignorado || !(e.pagoEm || '').startsWith(periodo)) continue;
+      const d = m.get(e.pagoEm) || { data: e.pagoEm, recebido: 0, pago: 0, qtd: 0 };
+      if (e.tipo === 'receita') d.recebido = round2(d.recebido + e.valor);
+      else d.pago = round2(d.pago + e.valor);
+      d.qtd++;
+      m.set(e.pagoEm, d);
+    }
+    return [...m.values()].map((d) => ({ ...d, lucro: round2(d.recebido - d.pago) })).sort((a, b) => a.data.localeCompare(b.data));
+  });
+}
+
 export function serieMeses(n, ateYm = ymAtual()) {
   const out = [];
   for (let i = n - 1; i >= 0; i--) out.push(resumoMes(ymAdd(ateYm, -i)));

@@ -12,7 +12,7 @@ Aplicativo web de controle de caixa. Funciona no celular, no tablet e no computa
 - **Gastos fixos:** aluguel, salários, internet etc. entram sozinhos nas contas de cada mês. Os parcelados mostram a parcela atual, quanto falta e **quando acabam**. Também aceita receitas recorrentes (contratos mensais).
 - **Contas:** caixa em dinheiro, banco/Pix, saldo inicial e transferências entre contas (sangria/depósito).
 - **Relatórios:** resultado mês a mês, receitas e despesas por categoria, melhores clientes, formas de recebimento.
-- **Exportar para planilha:** arquivo `.xlsx` com 8 abas (resumo mensal, lançamentos, a receber, a pagar, clientes, vendas parceladas, fixos e contas), além de CSV e backup.
+- **Exportar para planilha:** arquivo `.xlsx` com 9 abas (resumo mensal, resumo diário, lançamentos, a receber, a pagar, clientes, vendas parceladas, fixos e contas), além de CSV e backup.
 
 ## Onde os dados ficam
 

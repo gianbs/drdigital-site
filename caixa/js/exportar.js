@@ -2,7 +2,7 @@
 
 import { store, config } from './store.js';
 import { hoje, ymAtual, ymAdd, ymDe, mesCurto, baixar, diasEntre, round2, semAcento } from './util.js';
-import { entradas, resumoMes, saldos, situacaoClientes, infoVenda, infoFixo, abertos, nomeCliente, nomeConta, dataEfetiva } from './calc.js';
+import { entradas, resumoMes, resumoDias, saldos, situacaoClientes, infoVenda, infoFixo, abertos, nomeCliente, nomeConta, dataEfetiva } from './calc.js';
 import { criarXlsx } from './xlsx.js';
 
 const SIT = { atraso: 'Em atraso', emdia: 'Em dia', quitado: 'Quitado', novo: 'Sem compras' };
@@ -82,10 +82,16 @@ export function montarPlanilhas() {
   const sd = saldos();
   const contas = sd.porConta.map((c) => [c.conta.nome, c.conta.saldoInicial || 0, c.saldo]);
 
+  const tRec2 = round2(resumoDias().reduce((t, d) => t + d.recebido, 0));
+  const tPag2 = round2(resumoDias().reduce((t, d) => t + d.pago, 0));
+
   return [
     { nome: 'Resumo mensal', colunas: [{ titulo: 'Mês', largura: 12 }, { titulo: 'Receitas recebidas', tipo: 'moeda', largura: 20 }, { titulo: 'Despesas pagas', tipo: 'moeda', largura: 18 },
         { titulo: 'Resultado', tipo: 'moeda', largura: 16 }, { titulo: 'Margem', tipo: 'pct', largura: 10 }, { titulo: 'Vendido no mês', tipo: 'moeda', largura: 18 }],
       linhas: resumo, total: ['Total', tRec, tPag, round2(tRec - tPag), tRec ? round2(((tRec - tPag) / tRec) * 10000) / 10000 : '', soma(resumo, 5)] },
+    { nome: 'Resumo diário', colunas: [{ titulo: 'Dia', tipo: 'data', largura: 12 }, { titulo: 'Receitas recebidas', tipo: 'moeda', largura: 20 }, { titulo: 'Despesas pagas', tipo: 'moeda', largura: 18 },
+        { titulo: 'Resultado', tipo: 'moeda', largura: 16 }, { titulo: 'Lançamentos', tipo: 'numero', largura: 14 }],
+      linhas: resumoDias().map((d) => [d.data, d.recebido, d.pago, d.lucro, d.qtd]), total: ['Total', tRec2, tPag2, round2(tRec2 - tPag2)] },
     { nome: 'Lançamentos', colunas: COL_LANC, linhas: lanc, total: ['Total', '', '', '', '', soma(lanc.filter((l) => l[8] === 'Recebido'), 5), soma(lanc.filter((l) => l[8] === 'Pago'), 6)].concat(['', 'somente recebidos e pagos']) },
     { nome: 'A receber', colunas: [{ titulo: 'Cliente', largura: 28 }, { titulo: 'Descrição', largura: 36 }, { titulo: 'Parcela', largura: 10 }, { titulo: 'Vencimento', tipo: 'data', largura: 12 },
         { titulo: 'Valor', tipo: 'moeda', largura: 14 }, { titulo: 'Situação', largura: 12 }, { titulo: 'Dias de atraso', tipo: 'numero', largura: 14 }, { titulo: 'WhatsApp', largura: 18 }],

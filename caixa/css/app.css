@@ -575,3 +575,14 @@ a.tile:hover { background: color-mix(in srgb, var(--superficie) 92%, var(--texto
   #app { display: block; }
   body { background: #fff; }
 }
+
+/* Relatório dia a dia */
+.cartao-dias { margin-bottom: 16px; }
+.cartao-dias .cartao-topo { flex-wrap: wrap; align-items: center; }
+.cartao-dias .troca-mes { background: var(--superficie-2); }
+.cartao-dias .tabela td .fraco { font-size: var(--f-nota); margin-left: 4px; text-transform: none; }
+@media (max-width: 560px) {
+  .cartao-dias .tabela { min-width: 0; font-size: var(--f-nota); }
+  .cartao-dias .tabela th:last-child, .cartao-dias .tabela td:last-child, .cartao-dias .tabela td .fraco { display: none; }
+  .cartao-dias .tabela th, .cartao-dias .tabela td { padding-left: 6px; }
+}

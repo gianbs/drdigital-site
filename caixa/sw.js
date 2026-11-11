@@ -1,6 +1,6 @@
 // Service worker: deixa o app abrir mesmo sem internet.
 // Estratégia: tenta a rede primeiro (para sempre pegar a versão nova) e cai no cache se estiver offline.
-const CACHE = 'caixa-drdigital-v3';
+const CACHE = 'caixa-drdigital-v4';
 const BASE = [
   './', 'index.html', 'config.js', 'css/app.css', 'manifest.webmanifest',
   'assets/logo.svg', 'assets/logo-white.svg', 'assets/icon.svg', 'assets/icone-180.png', 'assets/icone-192.png',
